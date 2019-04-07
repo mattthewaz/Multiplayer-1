@@ -236,6 +236,28 @@ namespace Multiplayer.Client
                 DirectXmlSaver.SaveDataObject(new SyncContainer(), "SyncHandlers.xml");
                 ExtendDirectXmlSaver.extend = false;
             }
+
+            if(GenCommandLine.TryGetCommandLineArg("host", out string save))
+            {
+                var settings = new ServerSettings();
+
+                settings.gameName = "Test";
+                settings.lanAddress = "127.0.0.1";
+                settings.bindPort = MultiplayerServer.DefaultPort;
+
+                LongEventHandler.QueueLongEvent(() =>
+                {
+                    MemoryUtility.ClearAllMapsAndWorld();
+                    Current.Game = new Game();
+                    Current.Game.InitData = new GameInitData();
+                    Current.Game.InitData.gameToLoad = save;
+
+                    LongEventHandler.ExecuteWhenFinished(() =>
+                    {
+                        LongEventHandler.QueueLongEvent(() => ClientUtil.HostServer(settings, false, debugMode: false), "MpLoading", false, null);
+                    });
+                }, "Play", "LoadingLongEvent", true, null);
+            }
         }
 
         public class SyncContainer

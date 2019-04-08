@@ -131,6 +131,8 @@
     <Compile Include="Common\Networking.cs" />
     <Compile Include="Common\Packets.cs" />
     <Compile Include="Common\ServerConnection.cs" />
+    <Compile Include="Common\SettingsFileReader.cs" />
+    <Compile Include="Common\Util\IniFile.cs" />
     <Compile Include="Common\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -215,17 +215,17 @@ namespace Multiplayer.Client
 
             if (GenCommandLine.TryGetCommandLineArg("replay", out string replay))
             {
+                var settings = SettingsReader.ReadServerSettings();
+
+                if (settings == null)
+                    return;
+
                 DoubleLongEvent(() =>
                 {
+                    void ReplayLoaded() => ClientUtil.HostServer(settings, true, false, debugMode: false);
                     Replay.LoadReplay(Replay.ReplayFile(replay), true, () =>
                     {
-                        var rand = Find.Maps.Select(m => m.AsyncTime().randState).Select(s => $"{s} {(uint)s} {s >> 32}");
-
-                        Log.Message($"timer {TickPatch.Timer}");
-                        Log.Message($"world rand {WorldComp.randState} {(uint)WorldComp.randState} {WorldComp.randState >> 32}");
-                        Log.Message($"map rand {rand.ToStringSafeEnumerable()} | {Find.Maps.Select(m => m.AsyncTime().mapTicks).ToStringSafeEnumerable()}");
-
-                        Application.Quit();
+                        ReplayLoaded();
                     });
                 }, "Replay");
             }
@@ -237,13 +237,13 @@ namespace Multiplayer.Client
                 ExtendDirectXmlSaver.extend = false;
             }
 
+            
             if(GenCommandLine.TryGetCommandLineArg("host", out string save))
             {
-                var settings = new ServerSettings();
+                var settings = SettingsReader.ReadServerSettings();
 
-                settings.gameName = "Test";
-                settings.lanAddress = "127.0.0.1";
-                settings.bindPort = MultiplayerServer.DefaultPort;
+                if (settings == null)
+                    return;
 
                 LongEventHandler.QueueLongEvent(() =>
                 {
